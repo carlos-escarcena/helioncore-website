@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Agentes de Voz con IA — Helion Core</title>
+  <meta name="description" content="Tu empresa atiende todas las llamadas con IA, 24/7. Sin esperas, sin coste de recepcionista. Para clínicas, despachos, comercios, restaurantes y más."/>
+  <link rel="icon" type="image/png" href="logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,700;12..96,800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+/* ── Reset ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+ul{list-style:none}
+
+/* ── Tokens ── */
+:root{
+  --ink:     #0C0C0F;
+  --ink2:    #1A1A24;
+  --paper:   #F4F2EE;
+  --paper2:  #ECEAE4;
+  --white:   #FFFFFF;
+  --indigo:  #4F46E5;
+  --indigo2: #3730A3;
+  --coral:   #FF5C35;
+  --muted:   #6B7280;
+  --border:  rgba(12,12,15,.1);
+  --border-l:rgba(255,255,255,.1);
+  --r:       14px;
+  --disp:   'Bricolage Grotesque', sans-serif;
+  --body:   'Outfit', sans-serif;
+}
+
+/* ── Base ── */
+body{
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.6;
+  background:var(--paper);
+  color:var(--ink);
+  overflow-x:hidden;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--paper)}
+::-webkit-scrollbar-thumb{background:var(--indigo);border-radius:4px}
+
+/* ── Utility ── */
+.container{max-width:1180px;margin:0 auto;padding:0 32px}
+.section{padding:120px 0}
+.section-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--disp);font-size:.72rem;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  padding:6px 16px;border-radius:100px;
+  border:1.5px solid var(--border);
+  color:var(--indigo);background:rgba(79,70,229,.06);
+  margin-bottom:28px;
+}
+.section-tag-dot{width:6px;height:6px;border-radius:50%;background:var(--indigo)}
+
+.headline{
+  font-family:var(--disp);
+  font-size:clamp(2.4rem,4.5vw,4rem);
+  font-weight:800;line-height:1.1;
+  letter-spacing:-.03em;
+  color:var(--ink);
+}
+.headline .em{
+  background:linear-gradient(135deg,var(--indigo),var(--coral));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.subline{
+  font-size:1.05rem;font-weight:400;
+  color:var(--muted);line-height:1.8;
+  max-width:580px;margin-top:16px;
+}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--disp);font-size:.85rem;font-weight:700;
+  letter-spacing:.04em;padding:14px 28px;border-radius:100px;
+  border:none;transition:all .22s ease;white-space:nowrap;
+}
+.btn-primary{background:var(--indigo);color:#fff;box-shadow:0 4px 20px rgba(79,70,229,.3)}
+.btn-primary:hover{background:var(--indigo2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(79,70,229,.4)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{background:var(--ink2);transform:translateY(-2px)}
+.btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--border)}
+.btn-outline:hover{border-color:var(--indigo);color:var(--indigo)}
+.btn-white{background:#fff;color:var(--ink);box-shadow:0 4px 20px rgba(0,0,0,.12)}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.18)}
+
+/* ── Reveal ── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease}
+.reveal.in{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
+.d4{transition-delay:.32s}.d5{transition-delay:.4s}.d6{transition-delay:.48s}
+
+/* ════════════════════════════════════════════
+   NAV
+════════════════════════════════════════════ */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:900;
+  padding:18px 0;
+  transition:background .3s,backdrop-filter .3s,border-color .3s,padding .3s;
+  border-bottom:1px solid transparent;
+}
+#nav.stuck{
+  background:rgba(244,242,238,.88);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-color:var(--border);padding:12px 0;
+}
+.nav-in{display:flex;align-items:center;justify-content:space-between;gap:32px}
+.nav-logo img{height:36px;width:auto;object-fit:contain}
+.nav-links{display:flex;gap:36px}
+.nav-links a{
+  font-size:.82rem;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);
+  transition:color .2s;
+}
+.nav-links a:hover{color:var(--ink)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:4px}
+.nav-hamburger span{display:block;width:22px;height:1.5px;background:var(--ink);border-radius:2px;transition:.3s}
+
+/* ════════════════════════════════════════════
+   HERO
+════════════════════════════════════════════ */
+#hero{
+  min-height:100vh;
+  background:var(--ink);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding-top:100px;
+  position:relative;overflow:hidden;
+}
+
+/* Noise texture */
+#hero::before{
+  content:'';position:absolute;inset:0;z-index:1;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.04;pointer-events:none;
+}
+
+/* Gradient orbs */
+.hero-orb{
+  position:absolute;border-radius:50%;
+  filter:blur(90px);pointer-events:none;
+}
+.orb-1{width:700px;height:700px;background:rgba(79,70,229,.2);top:-200px;right:-150px;z-index:1}
+.orb-2{width:500px;height:500px;background:rgba(255,92,53,.12);bottom:0;left:-100px;z-index:1}
+.orb-3{width:300px;height:300px;background:rgba(79,70,229,.15);top:30%;left:30%;z-index:1}
+
+.hero-inner{
+  position:relative;z-index:2;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0;align-items:end;
+}
+
+.hero-left{padding:0 0 80px 0}
+
+.hero-title{
+  font-family:var(--disp);
+  font-size:clamp(3rem,6vw,5.5rem);
+  font-weight:800;
+  line-height:1.03;
+  letter-spacing:-.04em;
+  color:#fff;
+  margin-bottom:28px;
+}
+.hero-title .grad{
+  background:linear-gradient(90deg,#818CF8,#F472B6 50%,var(--coral));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.hero-sub{
+  font-size:1.1rem;font-weight:400;
+  color:rgba(255,255,255,.55);
+  line-height:1.8;max-width:480px;margin-bottom:40px;
+}
+.hero-sub b{color:rgba(255,255,255,.85);font-weight:500}
+
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+
+.hero-right{
+  position:relative;
+  align-self:stretch;
+  display:flex;align-items:flex-end;justify-content:flex-end;
+  padding-right:0;
+}
+
+/* Phone mockup */
+.hero-phone{
+  position:relative;
+  width:300px;
+  margin-right:60px;
+  margin-bottom:60px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:32px;
+  padding:24px 20px;
+  backdrop-filter:blur(20px);
+  box-shadow:0 40px 120px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1);
+}
+.phone-bar{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:20px;
+  padding-bottom:16px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.phone-dot{width:8px;height:8px;border-radius:50%}
+.phone-dot.red{background:#FF5F57}
+.phone-dot.yellow{background:#FFBD2E}
+.phone-dot.green{background:#28C840}
+.phone-status{
+  margin-left:auto;display:flex;align-items:center;gap:6px;
+  font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  color:#4ADE80;font-weight:600;
+}
+.phone-pulse{
+  width:6px;height:6px;border-radius:50%;background:#4ADE80;
+  animation:pulse-g 1.8s ease-in-out infinite;
+}
+@keyframes pulse-g{
+  0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.5)}
+  50%{box-shadow:0 0 0 6px rgba(74,222,128,0)}
+}
+
+.chat-msg{
+  display:flex;gap:10px;margin-bottom:14px;align-items:flex-start;
+}
+.chat-msg.ai{flex-direction:row-reverse}
+.chat-avatar{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;font-weight:700;flex-shrink:0;
+}
+.chat-avatar.h{background:rgba(255,255,255,.12);color:rgba(255,255,255,.6)}
+.chat-avatar.a{background:var(--indigo);color:#fff}
+.chat-bubble{
+  max-width:200px;
+  padding:10px 13px;
+  border-radius:12px;
+  font-size:.75rem;
+  line-height:1.5;
+}
+.chat-bubble.h{
+  background:rgba(255,255,255,.08);
+  color:rgba(255,255,255,.8);
+  border-bottom-left-radius:4px;
+}
+.chat-bubble.a{
+  background:var(--indigo);
+  color:#fff;
+  border-bottom-right-radius:4px;
+}
+.chat-typing{
+  display:flex;align-items:center;gap:4px;
+  padding:12px 14px;
+  background:rgba(255,255,255,.05);
+  border-radius:12px;border-bottom-left-radius:4px;
+  width:56px;
+  margin-left:38px;
+}
+.typing-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(255,255,255,.35);
+  animation:blink .9s ease-in-out infinite;
+}
+.typing-dot:nth-child(2){animation-delay:.15s}
+.typing-dot:nth-child(3){animation-delay:.3s}
+@keyframes blink{
+  0%,80%,100%{transform:scale(1);opacity:.35}
+  40%{transform:scale(1.2);opacity:1}
+}
+
+.phone-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:18px;padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.phone-metric{text-align:center}
+.phone-metric-val{font-family:var(--disp);font-size:1.1rem;font-weight:800;color:#fff}
+.phone-metric-val small{font-size:.65rem;color:rgba(255,255,255,.4);font-weight:400;display:block}
+
+/* ════════════════════════════════════════════
+   MARQUEE
+════════════════════════════════════════════ */
+#marquee{
+  background:var(--indigo);
+  padding:14px 0;overflow:hidden;
+}
+.marquee-track{
+  display:flex;gap:0;width:max-content;
+  animation:scroll-left 28s linear infinite;
+}
+@keyframes scroll-left{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.marquee-item{
+  display:flex;align-items:center;gap:10px;
+  padding:0 36px;
+  font-family:var(--disp);font-size:.75rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.7);white-space:nowrap;
+}
+.marquee-item svg{opacity:.5;flex-shrink:0}
+
+/* ════════════════════════════════════════════
+   INTRO SPLIT
+════════════════════════════════════════════ */
+#intro{padding:100px 0}
+.intro-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:80px;align-items:center;
+}
+.intro-label{
+  font-family:var(--disp);font-size:.7rem;font-weight:700;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:var(--indigo);margin-bottom:20px;
+}
+.intro-body{font-size:1rem;color:var(--muted);line-height:1.85;margin-top:20px}
+.intro-body b{color:var(--ink);font-weight:600}
+
+.intro-card{
+  background:var(--ink);border-radius:24px;overflow:hidden;
+  padding:0;
+}
+.intro-card-top{
+  padding:32px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.intro-card-label{
+  font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:700;color:rgba(255,255,255,.3);margin-bottom:12px;
+}
+.call-flow{display:flex;flex-direction:column;gap:10px}
+.call-step{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;border-radius:10px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+  font-size:.82rem;color:rgba(255,255,255,.75);
+  transition:background .3s;
+}
+.call-step:hover{background:rgba(79,70,229,.15)}
+.call-step-icon{
+  width:30px;height:30px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.95rem;flex-shrink:0;
+}
+.call-step-icon.blue{background:rgba(79,70,229,.2)}
+.call-step-icon.purple{background:rgba(139,92,246,.2)}
+.call-step-icon.green{background:rgba(74,222,128,.15)}
+.call-step-icon.amber{background:rgba(251,191,36,.15)}
+.call-step-arrow{margin-left:auto;opacity:.25;font-size:.8rem}
+
+.intro-card-bottom{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:1px;background:rgba(255,255,255,.06);
+}
+.intro-mini-stat{
+  background:var(--ink);padding:24px;text-align:center;
+}
+.mini-stat-num{
+  font-family:var(--disp);font-size:2rem;font-weight:800;color:#fff;
+}
+.mini-stat-num span{color:#818CF8}
+.mini-stat-label{font-size:.75rem;color:rgba(255,255,255,.35);margin-top:4px}
+
+/* ════════════════════════════════════════════
+   BENTO FEATURES
+════════════════════════════════════════════ */
+#features{background:var(--paper2);padding:120px 0}
+.bento{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  grid-template-rows:auto;
+  gap:16px;
+  margin-top:64px;
+}
+.bento-card{
+  background:var(--white);border-radius:20px;
+  padding:36px;position:relative;overflow:hidden;
+  border:1px solid rgba(0,0,0,.06);
+  transition:box-shadow .3s,transform .3s;
+}
+.bento-card:hover{box-shadow:0 12px 40px rgba(0,0,0,.1);transform:translateY(-4px)}
+.b1{grid-column:span 5;grid-row:span 2}
+.b2{grid-column:span 7}
+.b3{grid-column:span 4}
+.b4{grid-column:span 3}
+.b5{grid-column:span 5}
+.b6{grid-column:span 7;grid-row:span 1}
+
+.bento-icon{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;margin-bottom:24px;
+}
+.bi-indigo{background:rgba(79,70,229,.1)}
+.bi-coral{background:rgba(255,92,53,.1)}
+.bi-emerald{background:rgba(16,185,129,.1)}
+.bi-amber{background:rgba(245,158,11,.1)}
+.bi-pink{background:rgba(236,72,153,.1)}
+.bi-slate{background:rgba(100,116,139,.1)}
+
+.bento-title{
+  font-family:var(--disp);font-size:1.1rem;font-weight:700;
+  color:var(--ink);margin-bottom:10px;line-height:1.3;
+}
+.bento-desc{font-size:.875rem;color:var(--muted);line-height:1.75}
+
+/* Large bento card accent */
+.b1 .bento-title{font-size:1.5rem;margin-bottom:14px}
+.bento-visual{
+  position:absolute;bottom:-10px;right:-10px;
+  width:140px;opacity:.07;pointer-events:none;
+  font-size:9rem;line-height:1;
+}
+
+/* Lang pills */
+.lang-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.lang-pill{
+  padding:5px 12px;border-radius:100px;
+  font-size:.72rem;font-weight:600;
+  border:1px solid rgba(79,70,229,.15);
+  background:rgba(79,70,229,.06);
+  color:var(--indigo);
+}
+
+/* Integration logos row */
+.integrations-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.int-badge{
+  padding:5px 14px;border-radius:8px;
+  font-size:.72rem;font-weight:700;letter-spacing:.05em;
+  background:var(--paper2);color:var(--muted);
+  border:1px solid rgba(0,0,0,.07);
+}
+
+/* ════════════════════════════════════════════
+   HOW IT WORKS
+════════════════════════════════════════════ */
+#how{background:var(--ink);padding:120px 0}
+.how-header{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;margin-bottom:72px}
+.how-header .headline{color:#fff}
+.how-header .subline{color:rgba(255,255,255,.45);max-width:340px}
+.steps-track{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;position:relative;
+}
+.steps-track::before{
+  content:'';
+  position:absolute;top:30px;left:calc(12.5%);right:calc(12.5%);
+  height:1px;background:linear-gradient(90deg,rgba(79,70,229,.5),rgba(255,92,53,.5));
+  z-index:0;
+}
+.step-card{
+  position:relative;z-index:1;
+  text-align:center;
+  padding:0 24px;
+}
+.step-circle{
+  width:60px;height:60px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--disp);font-size:1rem;font-weight:800;
+  margin:0 auto 28px;
+  border:2px solid rgba(255,255,255,.1);
+  background:var(--ink);
+  color:rgba(255,255,255,.3);
+  transition:.3s;
+}
+.step-card:nth-child(1) .step-circle{background:var(--indigo);color:#fff;border-color:var(--indigo);box-shadow:0 0 30px rgba(79,70,229,.4)}
+.step-card:nth-child(2) .step-circle{background:rgba(79,70,229,.15);color:#818CF8;border-color:rgba(79,70,229,.3)}
+.step-card:nth-child(3) .step-circle{background:rgba(255,92,53,.12);color:var(--coral);border-color:rgba(255,92,53,.3)}
+.step-card:nth-child(4) .step-circle{background:rgba(74,222,128,.1);color:#4ADE80;border-color:rgba(74,222,128,.3)}
+
+.step-title{
+  font-family:var(--disp);font-size:1rem;font-weight:700;
+  color:#fff;margin-bottom:10px;
+}
+.step-desc{font-size:.83rem;color:rgba(255,255,255,.4);line-height:1.7}
+.step-tag{
+  display:inline-block;margin-top:14px;
+  padding:4px 12px;border-radius:100px;
+  font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  background:rgba(255,255,255,.05);color:rgba(255,255,255,.4);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+/* ════════════════════════════════════════════
+   PRICING
+════════════════════════════════════════════ */
+#precios{padding:120px 0;background:var(--paper)}
+.pricing-row{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:20px;align-items:start;
+  margin-top:64px;
+}
+.p-card{
+  background:var(--white);border:1px solid rgba(0,0,0,.07);
+  border-radius:22px;padding:38px 32px;
+  transition:box-shadow .3s,transform .3s;
+}
+.p-card:hover{box-shadow:0 16px 50px rgba(0,0,0,.1);transform:translateY(-5px)}
+.p-card.hot{
+  background:var(--ink);border-color:var(--ink);
+  transform:translateY(-12px);
+  box-shadow:0 24px 60px rgba(0,0,0,.25);
+}
+.p-card.hot:hover{transform:translateY(-16px);box-shadow:0 32px 80px rgba(0,0,0,.35)}
+.p-tag{
+  display:inline-block;
+  font-size:.65rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  padding:5px 14px;border-radius:100px;
+  background:rgba(79,70,229,.1);color:var(--indigo);
+  margin-bottom:20px;
+}
+.p-card.hot .p-tag{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7)}
+.p-name{
+  font-family:var(--disp);font-size:1.3rem;font-weight:800;
+  color:var(--ink);margin-bottom:6px;
+}
+.p-card.hot .p-name{color:#fff}
+.p-price{
+  display:flex;align-items:baseline;gap:4px;
+  margin-bottom:6px;
+}
+.p-price .cur{font-family:var(--disp);font-size:1.1rem;font-weight:600;color:var(--muted)}
+.p-price .amt{font-family:var(--disp);font-size:2.8rem;font-weight:800;color:var(--ink);line-height:1}
+.p-price .per{font-size:.85rem;color:var(--muted)}
+.p-card.hot .cur,.p-card.hot .amt{color:#fff}
+.p-desc{font-size:.85rem;color:var(--muted);margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid rgba(0,0,0,.07);line-height:1.7}
+.p-card.hot .p-desc{color:rgba(255,255,255,.4);border-color:rgba(255,255,255,.08)}
+.p-feats{display:flex;flex-direction:column;gap:11px;margin-bottom:32px}
+.p-feats li{display:flex;align-items:flex-start;gap:10px;font-size:.87rem;color:var(--ink)}
+.p-card.hot .p-feats li{color:rgba(255,255,255,.8)}
+.p-feats li.off{opacity:.35}
+.p-check{flex-shrink:0;color:var(--indigo);margin-top:1px}
+.p-card.hot .p-check{color:#818CF8}
+.p-cross{flex-shrink:0;color:var(--muted);margin-top:1px}
+.p-cta{display:block;width:100%;text-align:center}
+
+/* ════════════════════════════════════════════
+   FAQ
+════════════════════════════════════════════ */
+#faq{padding:120px 0}
+.faq-wrap{
+  display:grid;grid-template-columns:1fr 1.4fr;
+  gap:80px;align-items:start;
+  margin-top:20px;
+}
+.faq-left{position:sticky;top:120px}
+.faq-left .headline{font-size:clamp(2rem,3.5vw,2.8rem)}
+.faq-contact{
+  margin-top:32px;padding:24px;border-radius:16px;
+  background:var(--indigo);
+}
+.faq-contact p{font-size:.88rem;color:rgba(255,255,255,.7);margin-bottom:16px}
+.faq-contact a{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--disp);font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:#fff;border-bottom:1px solid rgba(255,255,255,.3);padding-bottom:4px;
+  transition:border-color .2s;
+}
+.faq-contact a:hover{border-color:#fff}
+
+.faq-list{display:flex;flex-direction:column;gap:0}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{
+  width:100%;background:none;border:none;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:22px 0;text-align:left;cursor:pointer;
+  font-family:var(--disp);font-size:.98rem;font-weight:600;color:var(--ink);
+  transition:color .2s;
+}
+.faq-q:hover{color:var(--indigo)}
+.faq-icon{
+  width:26px;height:26px;border-radius:50%;
+  border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:1rem;flex-shrink:0;
+  transition:transform .3s,background .2s,border-color .2s;
+}
+.faq-item.open .faq-icon{transform:rotate(45deg);background:var(--indigo);border-color:var(--indigo);color:#fff}
+.faq-ans{max-height:0;overflow:hidden;transition:max-height .38s ease}
+.faq-item.open .faq-ans{max-height:260px}
+.faq-ans-in{padding:0 0 22px;font-size:.9rem;color:var(--muted);line-height:1.8}
+
+/* ════════════════════════════════════════════
+   CTA FINAL
+════════════════════════════════════════════ */
+#cta{
+  background:var(--ink);padding:120px 0;
+  position:relative;overflow:hidden;
+}
+#cta::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 70% at 50% 100%,rgba(79,70,229,.15),transparent);
+}
+.cta-inner{position:relative;z-index:1;text-align:center}
+.cta-inner .headline{color:#fff;font-size:clamp(2.5rem,5vw,4.5rem)}
+.cta-inner .headline .grad{
+  background:linear-gradient(90deg,#818CF8,#F472B6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.cta-inner .subline{color:rgba(255,255,255,.45);margin:16px auto 48px}
+.cta-form{
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  max-width:640px;margin:0 auto;
+}
+.cta-input{
+  flex:1;min-width:180px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:100px;
+  padding:14px 22px;
+  font-family:var(--body);font-size:.9rem;color:#fff;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.cta-input::placeholder{color:rgba(255,255,255,.3)}
+.cta-input:focus{border-color:rgba(79,70,229,.6);box-shadow:0 0 0 4px rgba(79,70,229,.15)}
+.cta-note{margin-top:16px;font-size:.78rem;color:rgba(255,255,255,.25)}
+.form-ok{
+  display:none;text-align:center;padding:32px;
+  font-family:var(--disp);font-size:1.2rem;font-weight:700;
+  color:#4ADE80;
+}
+.form-ok.show{display:block}
+
+/* ════════════════════════════════════════════
+   FOOTER
+════════════════════════════════════════════ */
+footer{
+  background:var(--ink2);
+  border-top:1px solid rgba(255,255,255,.06);
+  padding:64px 0 32px;
+}
+.footer-grid{
+  display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;
+  gap:48px;margin-bottom:48px;
+}
+.footer-brand img{height:32px;width:auto;filter:brightness(0) invert(1);opacity:.8;margin-bottom:16px}
+.footer-brand p{font-size:.85rem;color:rgba(255,255,255,.3);line-height:1.7;max-width:220px;margin-bottom:20px}
+.socials{display:flex;gap:10px}
+.social{
+  width:34px;height:34px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.35);font-size:.8rem;
+  transition:border-color .2s,color .2s;
+}
+.social:hover{border-color:rgba(79,70,229,.5);color:#818CF8}
+.footer-col-h{
+  font-family:var(--disp);font-size:.68rem;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.25);margin-bottom:18px;
+}
+.footer-links{display:flex;flex-direction:column;gap:10px}
+.footer-links a{font-size:.85rem;color:rgba(255,255,255,.4);transition:color .2s}
+.footer-links a:hover{color:rgba(255,255,255,.8)}
+.footer-bottom{
+  padding-top:28px;border-top:1px solid rgba(255,255,255,.06);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+}
+.footer-copy{font-size:.78rem;color:rgba(255,255,255,.2)}
+.footer-legal{display:flex;gap:24px}
+.footer-legal a{font-size:.78rem;color:rgba(255,255,255,.2);transition:color .2s}
+.footer-legal a:hover{color:rgba(255,255,255,.6)}
+
+/* ════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════ */
+@media(max-width:1024px){
+  .hero-inner{grid-template-columns:1fr;gap:48px}
+  .hero-right{justify-content:flex-start}
+  .hero-phone{margin:0}
+  .intro-grid{grid-template-columns:1fr;gap:48px}
+  .bento{grid-template-columns:repeat(6,1fr)}
+  .b1,.b2,.b3,.b4,.b5,.b6{grid-column:span 3;grid-row:span 1}
+  .steps-track{grid-template-columns:1fr 1fr;gap:40px}
+  .steps-track::before{display:none}
+  .pricing-row{grid-template-columns:1fr;max-width:420px;margin:0 auto}
+  .p-card.hot{transform:none}
+  .faq-wrap{grid-template-columns:1fr;gap:48px}
+  .faq-left{position:static}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px}
+}
+@media(max-width:768px){
+  .section{padding:80px 0}
+  .container{padding:0 20px}
+  .nav-links,.nav-right .btn-outline{display:none}
+  .nav-hamburger{display:flex}
+  .hero-title{font-size:clamp(2.4rem,8vw,4rem)}
+  .hero-actions{flex-direction:column}
+  .how-header{flex-direction:column;gap:20px}
+  .bento{grid-template-columns:1fr}
+  .b1,.b2,.b3,.b4,.b5,.b6{grid-column:span 1}
+  .pricing-row{max-width:100%}
+  .cta-form{flex-direction:column;align-items:stretch}
+  .footer-grid{grid-template-columns:1fr}
+  .steps-track{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ NAV ══════════ -->
+<nav id="nav">
+  <div class="container nav-in">
+    <a href="index.html" class="nav-logo"><img src="logo.png" alt="Helion Core"/></a>
+    <ul class="nav-links">
+      <li><a href="index.html" style="color:var(--muted);">← Inicio</a></li>
+      <li><a href="#features">Características</a></li>
+      <li><a href="#how">Proceso</a></li>
+      <li><a href="#precios">Precios</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="login.html" class="btn btn-outline" style="padding:10px 20px;font-size:.78rem">Acceder</a>
+      <a href="#cta" class="btn btn-primary" style="padding:10px 20px;font-size:.78rem">Demo gratuita</a>
+    </div>
+    <button class="nav-hamburger" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ══════════ HERO ══════════ -->
+<section id="hero">
+  <div class="hero-orb orb-1"></div>
+  <div class="hero-orb orb-2"></div>
+  <div class="hero-orb orb-3"></div>
+
+  <div class="container hero-inner">
+    <div class="hero-left">
+      <h1 class="hero-title reveal">
+        La voz de tu empresa,<br>
+        <span class="grad">reinventada por IA</span>
+      </h1>
+      <p class="hero-sub reveal d1">
+        Helion Core atiende cada llamada con <b>naturalidad humana</b>, gestiona citas y consultas en tiempo real — <b>24 horas al día, sin coste de recepcionista</b>.
+      </p>
+      <div class="hero-actions reveal d2">
+        <a href="#cta" class="btn btn-white">Solicitar demo gratuita →</a>
+        <a href="#how" class="btn btn-outline" style="color:rgba(255,255,255,.6);border-color:rgba(255,255,255,.15)">Ver cómo funciona</a>
+      </div>
+    </div>
+
+    <div class="hero-right reveal d1">
+      <div class="hero-phone">
+        <div class="phone-bar">
+          <div class="phone-dot red"></div>
+          <div class="phone-dot yellow"></div>
+          <div class="phone-dot green"></div>
+          <div class="phone-status">
+            <div class="phone-pulse"></div>
+            En llamada
+          </div>
+        </div>
+        <div id="chat-window">
+          <div class="chat-msg">
+            <div class="chat-avatar h">H</div>
+            <div class="chat-bubble h" id="msg-human">Hola, ¿podría pedir cita para mañana?</div>
+          </div>
+          <div class="chat-msg ai">
+            <div class="chat-avatar a">IA</div>
+            <div class="chat-bubble a" id="msg-ai">¡Claro! Tengo disponibilidad mañana a las 10:00 y 16:30. ¿Cuál le viene mejor?</div>
+          </div>
+          <div class="chat-typing" id="typing">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+        <div class="phone-footer">
+          <div class="phone-metric">
+            <div class="phone-metric-val">24/7<small>disponible</small></div>
+          </div>
+          <div class="phone-metric">
+            <div class="phone-metric-val">18s<small>resp.</small></div>
+          </div>
+          <div class="phone-metric">
+            <div class="phone-metric-val">98%<small>satisf.</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ MARQUEE ══════════ -->
+<div id="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Voz natural con IA</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Cualquier sector</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Citas y consultas 24/7</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> 40+ idiomas nativos</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Escalado inteligente al equipo</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> RGPD compliant · Datos en Europa</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Respuesta en menos de 2 segundos</span>
+    <!-- Duplicate for seamless loop -->
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Voz natural con IA</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Cualquier sector</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Citas y consultas 24/7</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> 40+ idiomas nativos</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Escalado inteligente al equipo</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> RGPD compliant · Datos en Europa</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Respuesta en menos de 2 segundos</span>
+  </div>
+</div>
+
+<!-- ══════════ INTRO ══════════ -->
+<section id="intro">
+  <div class="container">
+    <div class="intro-grid">
+      <div>
+        <div class="intro-label reveal">Por qué Helion Core</div>
+        <h2 class="headline reveal d1">No es un bot.<br>Es tu mejor <span class="em">recepcionista</span>.</h2>
+        <p class="intro-body reveal d2">
+          Cada llamada perdida es un cliente que va a la competencia. Helion Core elimina ese problema con una IA que <b>suena humana, actúa en segundos</b> y nunca se toma el día libre.
+        </p>
+        <p class="intro-body reveal d3" style="margin-top:12px">
+          Se configura para cualquier negocio en 48 horas. <b>Sin infraestructura, sin aprendizaje técnico</b> para tu equipo.
+        </p>
+      </div>
+      <div class="reveal d2">
+        <div class="intro-card">
+          <div class="intro-card-top">
+            <div class="intro-card-label">Flujo de atención en tiempo real</div>
+            <div class="call-flow">
+              <div class="call-step">
+                <div class="call-step-icon blue">📞</div>
+                Llamada entrante — respuesta en &lt;2 seg
+                <span class="call-step-arrow">→</span>
+              </div>
+              <div class="call-step">
+                <div class="call-step-icon purple">🧠</div>
+                IA comprende la intención y consulta tu sistema
+                <span class="call-step-arrow">→</span>
+              </div>
+              <div class="call-step">
+                <div class="call-step-icon green">✅</div>
+                Cita agendada o consulta resuelta
+                <span class="call-step-arrow">→</span>
+              </div>
+              <div class="call-step">
+                <div class="call-step-icon amber">📊</div>
+                Registro automático en tu dashboard
+                <span class="call-step-arrow">→</span>
+              </div>
+            </div>
+          </div>
+          <div class="intro-card-bottom">
+            <div class="intro-mini-stat">
+              <div class="mini-stat-num"><span>100</span>%</div>
+              <div class="mini-stat-label">Llamadas atendidas</div>
+            </div>
+            <div class="intro-mini-stat">
+              <div class="mini-stat-num"><span>24</span>/7</div>
+              <div class="mini-stat-label">Disponibilidad</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FEATURES BENTO ══════════ -->
+<section id="features">
+  <div class="container">
+    <div class="text-center reveal" style="text-align:center">
+      <span class="section-tag"><span class="section-tag-dot"></span>Características</span>
+      <h2 class="headline reveal d1">Todo lo que necesitas.<br>Nada que no uses.</h2>
+    </div>
+    <div class="bento">
+      <div class="bento-card b1 reveal">
+        <div class="bento-icon bi-indigo">📅</div>
+        <div class="bento-title">Gestión de citas y consultas</div>
+        <div class="bento-desc">Agenda, modifica y cancela citas directamente en tu calendario o sistema de gestión sin intervención humana. Cada interacción queda registrada al instante.</div>
+        <div class="bento-visual">📅</div>
+      </div>
+      <div class="bento-card b2 reveal d1">
+        <div class="bento-icon bi-coral">🌍</div>
+        <div class="bento-title">40+ idiomas con voz natural</div>
+        <div class="bento-desc">Tu asistente habla el idioma del cliente desde el primer momento, sin acento artificial y con el tono exacto de tu marca.</div>
+        <div class="lang-pills">
+          <span class="lang-pill">Español</span><span class="lang-pill">English</span><span class="lang-pill">Français</span>
+          <span class="lang-pill">Deutsch</span><span class="lang-pill">中文</span><span class="lang-pill">العربية</span>
+          <span class="lang-pill">+34 más</span>
+        </div>
+      </div>
+      <div class="bento-card b3 reveal d2">
+        <div class="bento-icon bi-emerald">🔁</div>
+        <div class="bento-title">Escalado inteligente</div>
+        <div class="bento-desc">Cuando la situación lo requiere, transfiere al agente correcto con todo el contexto. Nunca empieza de cero.</div>
+      </div>
+      <div class="bento-card b4 reveal d3">
+        <div class="bento-icon bi-amber">📊</div>
+        <div class="bento-title">Analítica en tiempo real</div>
+        <div class="bento-desc">Dashboard con volumen de llamadas, tiempos de respuesta, temas recurrentes y satisfacción.</div>
+      </div>
+      <div class="bento-card b5 reveal d1">
+        <div class="bento-icon bi-pink">🏢</div>
+        <div class="bento-title">Compatible con cualquier sector</div>
+        <div class="bento-desc">Clínicas, despachos de abogados, inmobiliarias, restaurantes, comercios, agencias y mucho más.</div>
+        <div class="integrations-row">
+          <span class="int-badge">Clínicas</span><span class="int-badge">Abogados</span>
+          <span class="int-badge">Inmobiliarias</span><span class="int-badge">Restaurantes</span>
+          <span class="int-badge">Comercios</span><span class="int-badge">+ cualquier negocio</span>
+        </div>
+      </div>
+      <div class="bento-card b6 reveal d2">
+        <div class="bento-icon bi-slate">🎨</div>
+        <div class="bento-title">Tu marca, tu voz</div>
+        <div class="bento-desc">Personaliza nombre, tono, flujos y respuestas para que el asistente suene exactamente como tu empresa quiere sonar — desde un despacho boutique hasta una cadena nacional.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ HOW ══════════ -->
+<section id="how">
+  <div class="container">
+    <div class="how-header">
+      <div>
+        <span class="section-tag" style="border-color:rgba(255,255,255,.1);color:#818CF8;background:rgba(79,70,229,.1);"><span class="section-tag-dot" style="background:#818CF8"></span>Proceso</span>
+        <h2 class="headline">Cuatro pasos.<br>Una experiencia perfecta.</h2>
+      </div>
+      <p class="subline">Desde que entra la llamada hasta que el cliente cuelga satisfecho, Helion Core lo orquesta todo.</p>
+    </div>
+    <div class="steps-track">
+      <div class="step-card reveal">
+        <div class="step-circle">01</div>
+        <div class="step-title">Llamada entrante</div>
+        <div class="step-desc">El cliente llama. Helion Core responde en menos de 2 segundos, sin música de espera ni menús automáticos.</div>
+        <span class="step-tag">Respuesta &lt; 2s</span>
+      </div>
+      <div class="step-card reveal d1">
+        <div class="step-circle">02</div>
+        <div class="step-title">Comprende y actúa</div>
+        <div class="step-desc">La IA identifica la intención, consulta tu agenda o sistema y construye una respuesta precisa en el idioma del cliente.</div>
+        <span class="step-tag">Integración nativa</span>
+      </div>
+      <div class="step-card reveal d2">
+        <div class="step-circle">03</div>
+        <div class="step-title">Resuelve o escala</div>
+        <div class="step-desc">Agenda citas, responde preguntas frecuentes o transfiere al agente humano con todo el contexto. Sin fricciones.</div>
+        <span class="step-tag">Zero contexto perdido</span>
+      </div>
+      <div class="step-card reveal d3">
+        <div class="step-circle">04</div>
+        <div class="step-title">Aprende y mejora</div>
+        <div class="step-desc">Cada llamada perfecciona el sistema. Tu asistente mejora semana a semana, adaptándose a los patrones de tu negocio.</div>
+        <span class="step-tag">IA continua</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PRICING ══════════ -->
+<section id="precios">
+  <div class="container">
+    <div style="text-align:center">
+      <span class="section-tag reveal"><span class="section-tag-dot"></span>Precios</span>
+      <h2 class="headline reveal d1">Planes que crecen contigo</h2>
+      <p class="subline reveal d2" style="margin:16px auto 0;text-align:center">Sin permanencia. Sin letra pequeña. Cancela cuando quieras.</p>
+    </div>
+    <div class="pricing-row">
+      <!-- Básico -->
+      <div class="p-card reveal">
+        <span class="p-tag">Empieza hoy</span>
+        <div class="p-name">Básico</div>
+        <div class="p-price">
+          <span class="cur">€</span>
+          <span class="amt">300</span>
+          <span class="per">/mes</span>
+        </div>
+        <div class="p-desc">Para negocios que quieren cubrir todas sus llamadas desde el primer día.</div>
+        <ul class="p-feats">
+          <li><span class="p-check">✓</span>Hasta 500 llamadas/mes</li>
+          <li><span class="p-check">✓</span>Gestión de citas y consultas</li>
+          <li><span class="p-check">✓</span>5 idiomas</li>
+          <li><span class="p-check">✓</span>Dashboard básico</li>
+          <li><span class="p-check">✓</span>Soporte por email</li>
+        </ul>
+        <a href="#cta" class="btn btn-outline p-cta">Comenzar</a>
+      </div>
+      <!-- Profesional -->
+      <div class="p-card hot reveal d1">
+        <span class="p-tag">Más popular</span>
+        <div class="p-name">Profesional</div>
+        <div class="p-price">
+          <span class="cur">€</span>
+          <span class="amt">600</span>
+          <span class="per">/mes</span>
+        </div>
+        <div class="p-desc">Para empresas con mayor volumen y necesidad de personalización avanzada.</div>
+        <ul class="p-feats">
+          <li><span class="p-check">✓</span>Llamadas ilimitadas</li>
+          <li><span class="p-check">✓</span>40+ idiomas</li>
+          <li><span class="p-check">✓</span>Integración con tu CRM o agenda</li>
+          <li><span class="p-check">✓</span>Analítica avanzada</li>
+          <li><span class="p-check">✓</span>Voz y tono personalizados</li>
+          <li><span class="p-check">✓</span>Soporte 24/7 prioritario</li>
+          <li><span class="p-check">✓</span>API Access</li>
+        </ul>
+        <a href="#cta" class="btn btn-white p-cta">Solicitar demo</a>
+      </div>
+      <!-- Enterprise -->
+      <div class="p-card reveal d2">
+        <span class="p-tag">Gran escala</span>
+        <div class="p-name">Enterprise</div>
+        <div class="p-price">
+          <span class="amt" style="font-size:2rem">A medida</span>
+        </div>
+        <div class="p-desc">Para cadenas, franquicias o grupos con múltiples sedes y necesidades de infraestructura dedicada.</div>
+        <ul class="p-feats">
+          <li><span class="p-check">✓</span>Infraestructura dedicada</li>
+          <li><span class="p-check">✓</span>SLA 99.99% uptime</li>
+          <li><span class="p-check">✓</span>Integraciones ilimitadas</li>
+          <li><span class="p-check">✓</span>Modelo IA fine-tuned</li>
+          <li><span class="p-check">✓</span>Account manager propio</li>
+          <li><span class="p-check">✓</span>Contrato a medida</li>
+          <li><span class="p-check">✓</span>Onboarding dedicado</li>
+        </ul>
+        <a href="#cta" class="btn btn-outline p-cta">Hablar con ventas</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FAQ ══════════ -->
+<section id="faq">
+  <div class="container">
+    <div class="faq-wrap">
+      <div class="faq-left">
+        <span class="section-tag reveal"><span class="section-tag-dot"></span>FAQ</span>
+        <h2 class="headline reveal d1">Preguntas<br>frecuentes</h2>
+        <div class="faq-contact reveal d2">
+          <p>¿No encuentras la respuesta? Nuestro equipo está disponible para resolver cualquier duda.</p>
+          <a href="mailto:hola@helioncoreai.com">Escríbenos →</a>
+        </div>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item reveal">
+          <button class="faq-q" aria-expanded="false">
+            ¿Para qué tipo de empresas es Helion Core?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-ans">
+            <div class="faq-ans-in">Para cualquier negocio que reciba llamadas: clínicas, despachos de abogados, inmobiliarias, restaurantes, comercios, agencias de viaje, academias, talleres... Si tu empresa recibe llamadas, Helion Core puede gestionarlas.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal d1">
+          <button class="faq-q" aria-expanded="false">
+            ¿Cuánto tiempo lleva la configuración?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-ans">
+            <div class="faq-ans-in">La configuración estándar se completa en 24–48 horas. Nuestro equipo configura los flujos de conversación, personaliza la voz y conecta tus sistemas. No necesitas conocimientos técnicos.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal d2">
+          <button class="faq-q" aria-expanded="false">
+            ¿Qué pasa si la IA no sabe responder algo?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-ans">
+            <div class="faq-ans-in">El sistema detecta situaciones fuera de su alcance y transfiere la llamada al agente humano apropiado, incluyendo todo el contexto de la conversación. Nunca deja a un cliente sin respuesta.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal d3">
+          <button class="faq-q" aria-expanded="false">
+            ¿Se integra con mi sistema de citas o CRM?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-ans">
+            <div class="faq-ans-in">Sí. Nos integramos con los principales calendarios (Google Calendar, Outlook, Calendly) y CRM del mercado. Si usas un sistema propio o específico de tu sector, desarrollamos la integración personalizada.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal d4">
+          <button class="faq-q" aria-expanded="false">
+            ¿Los datos de mis clientes están seguros?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-ans">
+            <div class="faq-ans-in">Helion Core cumple con el RGPD. Todos los datos se procesan en servidores europeos, las comunicaciones están cifradas de extremo a extremo y nunca compartimos información de tus clientes con terceros.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal d5">
+          <button class="faq-q" aria-expanded="false">
+            ¿Puedo probarlo antes de contratar?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-ans">
+            <div class="faq-ans-in">Sí. Ofrecemos una demo personalizada configurada para tu sector y tipo de negocio. Podrás interactuar con el asistente y ver cómo respondería a las llamadas reales de tu empresa. Sin compromiso, sin tarjeta de crédito.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CTA FINAL ══════════ -->
+<section id="cta">
+  <div class="cta-inner container">
+    <span class="section-tag reveal" style="border-color:rgba(255,255,255,.1);color:#818CF8;background:rgba(79,70,229,.1);"><span class="section-tag-dot" style="background:#818CF8"></span>Empieza hoy</span>
+    <h2 class="headline reveal d1">¿Listo para que tu empresa<br><span class="grad">nunca pierda una llamada</span>?</h2>
+    <p class="subline reveal d2">Solicita tu demo gratuita. Un especialista se pondrá en contacto en menos de 24h.</p>
+    <form id="demo-form" class="cta-form reveal d3" novalidate>
+      <input type="text"  id="f-name"    class="cta-input" placeholder="Tu nombre"           required/>
+      <input type="email" id="f-email"   class="cta-input" placeholder="Email corporativo"    required/>
+      <input type="text"  id="f-company" class="cta-input" placeholder="Tu empresa y sector"  required/>
+      <button type="submit" class="btn btn-primary">Solicitar demo →</button>
+    </form>
+    <div class="form-ok" id="form-ok">✓ ¡Solicitud recibida! Te contactaremos en menos de 24h.</div>
+    <p class="cta-note reveal d4">Sin compromiso · Sin tarjeta de crédito · Respuesta en &lt;24h</p>
+  </div>
+</section>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="logo.png" alt="Helion Core"/>
+        <p>Agentes de voz con IA para empresas que no quieren perder ni una llamada.</p>
+        <div class="socials">
+          <a href="#" class="social" aria-label="LinkedIn">in</a>
+          <a href="#" class="social" aria-label="Twitter">𝕏</a>
+          <a href="#" class="social" aria-label="Instagram">ig</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-h">Producto</div>
+        <ul class="footer-links">
+          <li><a href="#features">Características</a></li>
+          <li><a href="#how">Cómo funciona</a></li>
+          <li><a href="#precios">Precios</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-h">Empresa</div>
+        <ul class="footer-links">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="automations.html">Automatizaciones</a></li>
+          <li><a href="#">Sobre nosotros</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-h">Contacto</div>
+        <ul class="footer-links">
+          <li><a href="mailto:hola@helioncoreai.com">hola@helioncoreai.com</a></li>
+          <li><a href="#">Soporte técnico</a></li>
+          <li><a href="#">Integraciones</a></li>
+          <li><a href="#">API Docs</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 Helion Core AI, S.L. Todos los derechos reservados.</p>
+      <div class="footer-legal">
+        <a href="#">Privacidad</a>
+        <a href="#">Términos</a>
+        <a href="#">Cookies</a>
+        <a href="#">RGPD</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Navbar scroll ── */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('stuck', scrollY > 50), {passive:true});
+
+/* ── Scroll reveal ── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+}, {threshold:.1});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ── Smooth scroll ── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if(t){ e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); }
+  });
+});
+
+/* ── FAQ ── */
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.closest('.faq-item');
+    const open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => { i.classList.remove('open'); i.querySelector('.faq-q').setAttribute('aria-expanded','false'); });
+    if(!open){ item.classList.add('open'); btn.setAttribute('aria-expanded','true'); }
+  });
+});
+
+/* ── Demo form ── */
+document.getElementById('demo-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const name    = document.getElementById('f-name').value.trim();
+  const email   = document.getElementById('f-email').value.trim();
+  const company = document.getElementById('f-company').value.trim();
+  if(!name || !email || !company) return;
+  this.style.display='none';
+  document.getElementById('form-ok').classList.add('show');
+});
+
+/* ── Live chat ticker ── */
+const convos = [
+  {h:'Hola, ¿podría pedir cita para mañana?', a:'¡Claro! Tengo disponibilidad mañana a las 10:00 y 16:30. ¿Cuál le viene mejor?'},
+  {h:'¿Cuál es el horario de atención?', a:'Atendemos de lunes a viernes de 9:00 a 19:00. ¿Desea que le agendemos una consulta?'},
+  {h:"I'd like to check the status of my order.", a:'Of course! Could you give me your order number? I\'ll look it up right away.'},
+  {h:'Necesito cancelar mi cita del viernes.', a:'Localizada. He cancelado su cita del viernes. ¿Desea reagendar para otra fecha?'},
+  {h:'¿Tenéis disponibilidad esta semana?', a:'Sí, tenemos huecos el martes a las 11:00 y el jueves a las 17:00. ¿Le apunto?'},
+];
+let ci = 0;
+function nextConvo(){
+  const c = convos[ci % convos.length];
+  const msgH = document.getElementById('msg-human');
+  const msgA = document.getElementById('msg-ai');
+  const typing = document.getElementById('typing');
+  if(!msgH) return;
+  msgH.style.opacity='0'; msgA.style.opacity='0';
+  setTimeout(() => {
+    msgH.textContent = c.h;
+    msgH.style.transition='opacity .4s'; msgH.style.opacity='1';
+    typing.style.display='flex'; msgA.style.opacity='0';
+    setTimeout(() => {
+      typing.style.display='none';
+      msgA.textContent = c.a;
+      msgA.style.transition='opacity .4s'; msgA.style.opacity='1';
+    }, 1800);
+  }, 400);
+  ci++;
+}
+setTimeout(() => setInterval(nextConvo, 5000), 2000);
+</script>
+</body>
+</html>

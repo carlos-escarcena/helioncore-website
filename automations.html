@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Automatizaciones de Negocio — Helion Core</title>
+  <meta name="description" content="Automatizamos tus procesos de negocio con flujos inteligentes, integraciones API y soluciones a medida. Sin trabajo manual, sin errores. Desde €1.000."/>
+  <link rel="icon" type="image/png" href="logo.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,700;12..96,800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+/* ── Reset ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+ul{list-style:none}
+
+/* ── Tokens ── */
+:root{
+  --ink:     #0C0C0F;
+  --ink2:    #1A1A24;
+  --paper:   #F4F2EE;
+  --paper2:  #ECEAE4;
+  --white:   #FFFFFF;
+  --indigo:  #4F46E5;
+  --indigo2: #3730A3;
+  --coral:   #FF5C35;
+  --muted:   #6B7280;
+  --border:  rgba(12,12,15,.1);
+  --border-l:rgba(255,255,255,.1);
+  --r:       14px;
+  --disp:   'Bricolage Grotesque', sans-serif;
+  --body:   'Outfit', sans-serif;
+}
+
+/* ── Base ── */
+body{
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.6;
+  background:var(--paper);
+  color:var(--ink);
+  overflow-x:hidden;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--paper)}
+::-webkit-scrollbar-thumb{background:var(--indigo);border-radius:4px}
+
+/* ── Utility ── */
+.container{max-width:1180px;margin:0 auto;padding:0 32px}
+.section{padding:120px 0}
+.section-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--disp);font-size:.72rem;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  padding:6px 16px;border-radius:100px;
+  border:1.5px solid var(--border);
+  color:var(--indigo);background:rgba(79,70,229,.06);
+  margin-bottom:28px;
+}
+.section-tag-dot{width:6px;height:6px;border-radius:50%;background:var(--indigo)}
+
+.headline{
+  font-family:var(--disp);
+  font-size:clamp(2.4rem,4.5vw,4rem);
+  font-weight:800;line-height:1.1;
+  letter-spacing:-.03em;
+  color:var(--ink);
+}
+.headline .em{
+  background:linear-gradient(135deg,var(--indigo),var(--coral));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.subline{
+  font-size:1.05rem;font-weight:400;
+  color:var(--muted);line-height:1.8;
+  max-width:580px;margin-top:16px;
+}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--disp);font-size:.85rem;font-weight:700;
+  letter-spacing:.04em;padding:14px 28px;border-radius:100px;
+  border:none;transition:all .22s ease;white-space:nowrap;
+}
+.btn-primary{background:var(--indigo);color:#fff;box-shadow:0 4px 20px rgba(79,70,229,.3)}
+.btn-primary:hover{background:var(--indigo2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(79,70,229,.4)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{background:var(--ink2);transform:translateY(-2px)}
+.btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--border)}
+.btn-outline:hover{border-color:var(--indigo);color:var(--indigo)}
+.btn-white{background:#fff;color:var(--ink);box-shadow:0 4px 20px rgba(0,0,0,.12)}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.18)}
+
+/* ── Reveal ── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease}
+.reveal.in{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}
+.d4{transition-delay:.32s}.d5{transition-delay:.4s}.d6{transition-delay:.48s}
+
+/* ════════════════════════════════════════════
+   NAV
+════════════════════════════════════════════ */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:900;
+  padding:18px 0;
+  transition:background .3s,backdrop-filter .3s,border-color .3s,padding .3s;
+  border-bottom:1px solid transparent;
+}
+#nav.stuck{
+  background:rgba(244,242,238,.88);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-color:var(--border);padding:12px 0;
+}
+.nav-in{display:flex;align-items:center;justify-content:space-between;gap:32px}
+.nav-logo img{height:36px;width:auto;object-fit:contain}
+.nav-links{display:flex;gap:36px}
+.nav-links a{
+  font-size:.82rem;font-weight:500;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);
+  transition:color .2s;
+}
+.nav-links a:hover{color:var(--ink)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:4px}
+.nav-hamburger span{display:block;width:22px;height:1.5px;background:var(--ink);border-radius:2px;transition:.3s}
+
+/* ════════════════════════════════════════════
+   HERO
+════════════════════════════════════════════ */
+#hero{
+  min-height:100vh;
+  background:var(--ink);
+  display:flex;flex-direction:column;justify-content:center;
+  padding-top:100px;
+  padding-bottom:80px;
+  position:relative;overflow:hidden;
+}
+
+/* Noise texture */
+#hero::before{
+  content:'';position:absolute;inset:0;z-index:1;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.04;pointer-events:none;
+}
+
+/* Gradient orbs */
+.hero-orb{
+  position:absolute;border-radius:50%;
+  filter:blur(90px);pointer-events:none;
+}
+.orb-1{width:700px;height:700px;background:rgba(79,70,229,.2);top:-200px;right:-150px;z-index:1}
+.orb-2{width:500px;height:500px;background:rgba(255,92,53,.12);bottom:0;left:-100px;z-index:1}
+.orb-3{width:300px;height:300px;background:rgba(79,70,229,.15);top:30%;left:30%;z-index:1}
+
+.hero-inner{
+  position:relative;z-index:2;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:80px;align-items:center;
+}
+
+.hero-left{padding:0}
+
+.hero-title{
+  font-family:var(--disp);
+  font-size:clamp(3rem,6vw,5.5rem);
+  font-weight:800;
+  line-height:1.03;
+  letter-spacing:-.04em;
+  color:#fff;
+  margin-bottom:28px;
+}
+.hero-title .grad{
+  background:linear-gradient(90deg,#818CF8,#F472B6 50%,var(--coral));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.hero-sub{
+  font-size:1.1rem;font-weight:400;
+  color:rgba(255,255,255,.55);
+  line-height:1.8;max-width:480px;margin-bottom:40px;
+}
+.hero-sub b{color:rgba(255,255,255,.85);font-weight:500}
+
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+
+/* Automation widget */
+.auto-widget{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:24px;
+  padding:28px;
+  backdrop-filter:blur(20px);
+  box-shadow:0 40px 120px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1);
+}
+.auto-widget-label{
+  font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:700;color:rgba(255,255,255,.3);margin-bottom:16px;
+}
+.auto-step{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;border-radius:10px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+  font-size:.82rem;color:rgba(255,255,255,.75);
+  margin-bottom:8px;
+  transition:background .3s;
+}
+.auto-step:hover{background:rgba(79,70,229,.15)}
+.auto-step:last-child{margin-bottom:0}
+.auto-step-icon{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;
+}
+.asi-blue{background:rgba(79,70,229,.2)}
+.asi-green{background:rgba(74,222,128,.15)}
+.asi-amber{background:rgba(251,191,36,.15)}
+.asi-coral{background:rgba(255,92,53,.15)}
+.auto-step-arrow{margin-left:auto;opacity:.25;font-size:.8rem}
+.auto-widget-footer{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:1px;background:rgba(255,255,255,.06);
+  border-radius:12px;overflow:hidden;
+  margin-top:20px;
+}
+.auto-mini-stat{
+  background:rgba(255,255,255,.03);
+  padding:16px;text-align:center;
+}
+.auto-mini-val{
+  font-family:var(--disp);font-size:1.5rem;font-weight:800;color:#fff;
+}
+.auto-mini-val span{color:#818CF8}
+.auto-mini-label{font-size:.7rem;color:rgba(255,255,255,.3);margin-top:3px}
+
+/* ════════════════════════════════════════════
+   MARQUEE
+════════════════════════════════════════════ */
+#marquee{
+  background:var(--indigo);
+  padding:14px 0;overflow:hidden;
+}
+.marquee-track{
+  display:flex;gap:0;width:max-content;
+  animation:scroll-left 28s linear infinite;
+}
+@keyframes scroll-left{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.marquee-item{
+  display:flex;align-items:center;gap:10px;
+  padding:0 36px;
+  font-family:var(--disp);font-size:.75rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.7);white-space:nowrap;
+}
+.marquee-item svg{opacity:.5;flex-shrink:0}
+
+/* ════════════════════════════════════════════
+   INTRO SPLIT
+════════════════════════════════════════════ */
+#intro{padding:100px 0}
+.intro-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:80px;align-items:center;
+}
+.intro-label{
+  font-family:var(--disp);font-size:.7rem;font-weight:700;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:var(--indigo);margin-bottom:20px;
+}
+.intro-body{font-size:1rem;color:var(--muted);line-height:1.85;margin-top:20px}
+.intro-body b{color:var(--ink);font-weight:600}
+
+.intro-card{
+  background:var(--ink);border-radius:24px;overflow:hidden;
+  padding:0;
+}
+.intro-card-top{
+  padding:32px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.intro-card-label{
+  font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:700;color:rgba(255,255,255,.3);margin-bottom:12px;
+}
+.call-flow{display:flex;flex-direction:column;gap:10px}
+.call-step{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;border-radius:10px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+  font-size:.82rem;color:rgba(255,255,255,.75);
+  transition:background .3s;
+}
+.call-step:hover{background:rgba(79,70,229,.15)}
+.call-step-icon{
+  width:30px;height:30px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.95rem;flex-shrink:0;
+}
+.call-step-icon.blue{background:rgba(79,70,229,.2)}
+.call-step-icon.purple{background:rgba(139,92,246,.2)}
+.call-step-icon.green{background:rgba(74,222,128,.15)}
+.call-step-icon.amber{background:rgba(251,191,36,.15)}
+.call-step-arrow{margin-left:auto;opacity:.25;font-size:.8rem}
+
+.intro-card-bottom{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:1px;background:rgba(255,255,255,.06);
+}
+.intro-mini-stat{
+  background:var(--ink);padding:24px;text-align:center;
+}
+.mini-stat-num{
+  font-family:var(--disp);font-size:2rem;font-weight:800;color:#fff;
+}
+.mini-stat-num span{color:#818CF8}
+.mini-stat-label{font-size:.75rem;color:rgba(255,255,255,.35);margin-top:4px}
+
+/* ════════════════════════════════════════════
+   BENTO FEATURES
+════════════════════════════════════════════ */
+#caracteristicas{background:var(--paper2);padding:120px 0}
+.bento{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  grid-template-rows:auto;
+  gap:16px;
+  margin-top:64px;
+}
+.bento-card{
+  background:var(--white);border-radius:20px;
+  padding:36px;position:relative;overflow:hidden;
+  border:1px solid rgba(0,0,0,.06);
+  transition:box-shadow .3s,transform .3s;
+}
+.bento-card:hover{box-shadow:0 12px 40px rgba(0,0,0,.1);transform:translateY(-4px)}
+.b1{grid-column:span 5;grid-row:span 2}
+.b2{grid-column:span 7}
+.b3{grid-column:span 4}
+.b4{grid-column:span 3}
+.b5{grid-column:span 5}
+.b6{grid-column:span 7;grid-row:span 1}
+
+.bento-icon{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;margin-bottom:24px;
+}
+.bi-indigo{background:rgba(79,70,229,.1)}
+.bi-coral{background:rgba(255,92,53,.1)}
+.bi-emerald{background:rgba(16,185,129,.1)}
+.bi-amber{background:rgba(245,158,11,.1)}
+.bi-pink{background:rgba(236,72,153,.1)}
+.bi-slate{background:rgba(100,116,139,.1)}
+
+.bento-title{
+  font-family:var(--disp);font-size:1.1rem;font-weight:700;
+  color:var(--ink);margin-bottom:10px;line-height:1.3;
+}
+.bento-desc{font-size:.875rem;color:var(--muted);line-height:1.75}
+
+.b1 .bento-title{font-size:1.5rem;margin-bottom:14px}
+.bento-visual{
+  position:absolute;bottom:-10px;right:-10px;
+  width:140px;opacity:.07;pointer-events:none;
+  font-size:9rem;line-height:1;
+}
+
+/* Integration logos row */
+.integrations-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.int-badge{
+  padding:5px 14px;border-radius:8px;
+  font-size:.72rem;font-weight:700;letter-spacing:.05em;
+  background:var(--paper2);color:var(--muted);
+  border:1px solid rgba(0,0,0,.07);
+}
+
+/* ════════════════════════════════════════════
+   HOW IT WORKS
+════════════════════════════════════════════ */
+#proceso{background:var(--ink);padding:120px 0}
+.how-header{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;margin-bottom:72px}
+.how-header .headline{color:#fff}
+.how-header .subline{color:rgba(255,255,255,.45);max-width:340px}
+.steps-track{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;position:relative;
+}
+.steps-track::before{
+  content:'';
+  position:absolute;top:30px;left:calc(12.5%);right:calc(12.5%);
+  height:1px;background:linear-gradient(90deg,rgba(79,70,229,.5),rgba(255,92,53,.5));
+  z-index:0;
+}
+.step-card{
+  position:relative;z-index:1;
+  text-align:center;
+  padding:0 24px;
+}
+.step-circle{
+  width:60px;height:60px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--disp);font-size:1rem;font-weight:800;
+  margin:0 auto 28px;
+  border:2px solid rgba(255,255,255,.1);
+  background:var(--ink);
+  color:rgba(255,255,255,.3);
+  transition:.3s;
+}
+.step-card:nth-child(1) .step-circle{background:var(--indigo);color:#fff;border-color:var(--indigo);box-shadow:0 0 30px rgba(79,70,229,.4)}
+.step-card:nth-child(2) .step-circle{background:rgba(79,70,229,.15);color:#818CF8;border-color:rgba(79,70,229,.3)}
+.step-card:nth-child(3) .step-circle{background:rgba(255,92,53,.12);color:var(--coral);border-color:rgba(255,92,53,.3)}
+.step-card:nth-child(4) .step-circle{background:rgba(74,222,128,.1);color:#4ADE80;border-color:rgba(74,222,128,.3)}
+
+.step-title{
+  font-family:var(--disp);font-size:1rem;font-weight:700;
+  color:#fff;margin-bottom:10px;
+}
+.step-desc{font-size:.83rem;color:rgba(255,255,255,.4);line-height:1.7}
+.step-tag{
+  display:inline-block;margin-top:14px;
+  padding:4px 12px;border-radius:100px;
+  font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  background:rgba(255,255,255,.05);color:rgba(255,255,255,.4);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+/* ════════════════════════════════════════════
+   PRICING
+════════════════════════════════════════════ */
+#precios{padding:120px 0;background:var(--paper)}
+.pricing-row{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:20px;align-items:start;
+  margin-top:64px;
+  max-width:800px;margin-left:auto;margin-right:auto;
+}
+.p-card{
+  background:var(--white);border:1px solid rgba(0,0,0,.07);
+  border-radius:22px;padding:38px 32px;
+  transition:box-shadow .3s,transform .3s;
+}
+.p-card:hover{box-shadow:0 16px 50px rgba(0,0,0,.1);transform:translateY(-5px)}
+.p-card.hot{
+  background:var(--ink);border-color:var(--ink);
+  box-shadow:0 24px 60px rgba(0,0,0,.25);
+}
+.p-card.hot:hover{transform:translateY(-5px);box-shadow:0 32px 80px rgba(0,0,0,.35)}
+.p-tag{
+  display:inline-block;
+  font-size:.65rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  padding:5px 14px;border-radius:100px;
+  background:rgba(79,70,229,.1);color:var(--indigo);
+  margin-bottom:20px;
+}
+.p-card.hot .p-tag{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7)}
+.p-name{
+  font-family:var(--disp);font-size:1.3rem;font-weight:800;
+  color:var(--ink);margin-bottom:6px;
+}
+.p-card.hot .p-name{color:#fff}
+.p-price{
+  display:flex;align-items:baseline;gap:4px;
+  margin-bottom:6px;
+}
+.p-price .cur{font-family:var(--disp);font-size:1.1rem;font-weight:600;color:var(--muted)}
+.p-price .amt{font-family:var(--disp);font-size:2.8rem;font-weight:800;color:var(--ink);line-height:1}
+.p-price .per{font-size:.85rem;color:var(--muted)}
+.p-card.hot .cur,.p-card.hot .amt{color:#fff}
+.p-desc{font-size:.85rem;color:var(--muted);margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid rgba(0,0,0,.07);line-height:1.7}
+.p-card.hot .p-desc{color:rgba(255,255,255,.4);border-color:rgba(255,255,255,.08)}
+.p-feats{display:flex;flex-direction:column;gap:11px;margin-bottom:32px}
+.p-feats li{display:flex;align-items:flex-start;gap:10px;font-size:.87rem;color:var(--ink)}
+.p-card.hot .p-feats li{color:rgba(255,255,255,.8)}
+.p-check{flex-shrink:0;color:var(--indigo);margin-top:1px}
+.p-card.hot .p-check{color:#818CF8}
+.p-cta{display:block;width:100%;text-align:center}
+
+/* ════════════════════════════════════════════
+   FAQ
+════════════════════════════════════════════ */
+#faq{padding:120px 0}
+.faq-wrap{
+  display:grid;grid-template-columns:1fr 1.4fr;
+  gap:80px;align-items:start;
+  margin-top:20px;
+}
+.faq-left{position:sticky;top:120px}
+.faq-left .headline{font-size:clamp(2rem,3.5vw,2.8rem)}
+.faq-contact{
+  margin-top:32px;padding:24px;border-radius:16px;
+  background:var(--indigo);
+}
+.faq-contact p{font-size:.88rem;color:rgba(255,255,255,.7);margin-bottom:16px}
+.faq-contact a{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--disp);font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:#fff;border-bottom:1px solid rgba(255,255,255,.3);padding-bottom:4px;
+  transition:border-color .2s;
+}
+.faq-contact a:hover{border-color:#fff}
+
+.faq-list{display:flex;flex-direction:column;gap:0}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{
+  width:100%;background:none;border:none;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:22px 0;text-align:left;cursor:pointer;
+  font-family:var(--disp);font-size:.98rem;font-weight:600;color:var(--ink);
+  transition:color .2s;
+}
+.faq-q:hover{color:var(--indigo)}
+.faq-icon{
+  width:26px;height:26px;border-radius:50%;
+  border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:1rem;flex-shrink:0;
+  transition:transform .3s,background .2s,border-color .2s;
+}
+.faq-item.open .faq-icon{transform:rotate(45deg);background:var(--indigo);border-color:var(--indigo);color:#fff}
+.faq-ans{max-height:0;overflow:hidden;transition:max-height .38s ease}
+.faq-item.open .faq-ans{max-height:260px}
+.faq-ans-in{padding:0 0 22px;font-size:.9rem;color:var(--muted);line-height:1.8}
+
+/* ════════════════════════════════════════════
+   CTA FINAL
+════════════════════════════════════════════ */
+#cta{
+  background:var(--ink);padding:120px 0;
+  position:relative;overflow:hidden;
+}
+#cta::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 70% at 50% 100%,rgba(79,70,229,.15),transparent);
+}
+.cta-inner{position:relative;z-index:1;text-align:center}
+.cta-inner .headline{color:#fff;font-size:clamp(2.5rem,5vw,4.5rem)}
+.cta-inner .headline .grad{
+  background:linear-gradient(90deg,#818CF8,#F472B6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.cta-inner .subline{color:rgba(255,255,255,.45);margin:16px auto 48px}
+.cta-form{
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  max-width:700px;margin:0 auto;
+}
+.cta-input{
+  flex:1;min-width:180px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:100px;
+  padding:14px 22px;
+  font-family:var(--body);font-size:.9rem;color:#fff;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.cta-input::placeholder{color:rgba(255,255,255,.3)}
+.cta-input:focus{border-color:rgba(79,70,229,.6);box-shadow:0 0 0 4px rgba(79,70,229,.15)}
+.cta-note{margin-top:16px;font-size:.78rem;color:rgba(255,255,255,.25)}
+.form-ok{
+  display:none;text-align:center;padding:32px;
+  font-family:var(--disp);font-size:1.2rem;font-weight:700;
+  color:#4ADE80;
+}
+.form-ok.show{display:block}
+
+/* ════════════════════════════════════════════
+   FOOTER
+════════════════════════════════════════════ */
+footer{
+  background:var(--ink2);
+  border-top:1px solid rgba(255,255,255,.06);
+  padding:64px 0 32px;
+}
+.footer-grid{
+  display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;
+  gap:48px;margin-bottom:48px;
+}
+.footer-brand img{height:32px;width:auto;filter:brightness(0) invert(1);opacity:.8;margin-bottom:16px}
+.footer-brand p{font-size:.85rem;color:rgba(255,255,255,.3);line-height:1.7;max-width:220px;margin-bottom:20px}
+.socials{display:flex;gap:10px}
+.social{
+  width:34px;height:34px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.35);font-size:.8rem;
+  transition:border-color .2s,color .2s;
+}
+.social:hover{border-color:rgba(79,70,229,.5);color:#818CF8}
+.footer-col-h{
+  font-family:var(--disp);font-size:.68rem;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.25);margin-bottom:18px;
+}
+.footer-links{display:flex;flex-direction:column;gap:10px}
+.footer-links a{font-size:.85rem;color:rgba(255,255,255,.4);transition:color .2s}
+.footer-links a:hover{color:rgba(255,255,255,.8)}
+.footer-bottom{
+  padding-top:28px;border-top:1px solid rgba(255,255,255,.06);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+}
+.footer-copy{font-size:.78rem;color:rgba(255,255,255,.2)}
+.footer-legal{display:flex;gap:24px}
+.footer-legal a{font-size:.78rem;color:rgba(255,255,255,.2);transition:color .2s}
+.footer-legal a:hover{color:rgba(255,255,255,.6)}
+
+/* ════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════ */
+@media(max-width:1024px){
+  .hero-inner{grid-template-columns:1fr;gap:48px}
+  .intro-grid{grid-template-columns:1fr;gap:48px}
+  .bento{grid-template-columns:repeat(6,1fr)}
+  .b1,.b2,.b3,.b4,.b5,.b6{grid-column:span 3;grid-row:span 1}
+  .steps-track{grid-template-columns:1fr 1fr;gap:40px}
+  .steps-track::before{display:none}
+  .pricing-row{grid-template-columns:1fr;max-width:420px;margin:64px auto 0}
+  .faq-wrap{grid-template-columns:1fr;gap:48px}
+  .faq-left{position:static}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px}
+}
+@media(max-width:768px){
+  .section{padding:80px 0}
+  .container{padding:0 20px}
+  .nav-links,.nav-right .btn-outline{display:none}
+  .nav-hamburger{display:flex}
+  .hero-title{font-size:clamp(2.4rem,8vw,4rem)}
+  .hero-actions{flex-direction:column}
+  .how-header{flex-direction:column;gap:20px}
+  .bento{grid-template-columns:1fr}
+  .b1,.b2,.b3,.b4,.b5,.b6{grid-column:span 1}
+  .pricing-row{max-width:100%}
+  .cta-form{flex-direction:column;align-items:stretch}
+  .footer-grid{grid-template-columns:1fr}
+  .steps-track{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ NAV ══════════ -->
+<nav id="nav">
+  <div class="container nav-in">
+    <a href="index.html" class="nav-logo"><img src="logo.png" alt="Helion Core"/></a>
+    <ul class="nav-links">
+      <li><a href="index.html" style="color:var(--muted);">← Inicio</a></li>
+      <li><a href="#caracteristicas">Características</a></li>
+      <li><a href="#proceso">Proceso</a></li>
+      <li><a href="#precios">Precios</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="login.html" class="btn btn-outline" style="padding:10px 20px;font-size:.78rem">Acceder</a>
+      <a href="#cta" class="btn btn-primary" style="padding:10px 20px;font-size:.78rem">Solicitar presupuesto</a>
+    </div>
+    <button class="nav-hamburger" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ══════════ HERO ══════════ -->
+<section id="hero">
+  <div class="hero-orb orb-1"></div>
+  <div class="hero-orb orb-2"></div>
+  <div class="hero-orb orb-3"></div>
+
+  <div class="container hero-inner">
+    <div class="hero-left">
+      <h1 class="hero-title reveal">
+        Automatiza tu empresa.<br>
+        <span class="grad">Multiplica tu capacidad.</span>
+      </h1>
+      <p class="hero-sub reveal d1">
+        Diseñamos e implementamos automatizaciones a medida que <b>conectan tus herramientas</b>, eliminan tareas manuales y escalan sin añadir personal.
+      </p>
+      <div class="hero-actions reveal d2">
+        <a href="#cta" class="btn btn-white">Solicitar presupuesto →</a>
+        <a href="#proceso" class="btn btn-outline" style="color:rgba(255,255,255,.6);border-color:rgba(255,255,255,.15)">Ver cómo funciona</a>
+      </div>
+    </div>
+
+    <div class="reveal d1">
+      <div class="auto-widget">
+        <div class="auto-widget-label">Automatización en marcha</div>
+        <div class="auto-step">
+          <div class="auto-step-icon asi-blue">🔗</div>
+          CRM actualizado automáticamente
+          <span class="auto-step-arrow">✓</span>
+        </div>
+        <div class="auto-step">
+          <div class="auto-step-icon asi-green">📧</div>
+          Email de seguimiento enviado al cliente
+          <span class="auto-step-arrow">✓</span>
+        </div>
+        <div class="auto-step">
+          <div class="auto-step-icon asi-amber">📄</div>
+          Factura generada y enviada
+          <span class="auto-step-arrow">✓</span>
+        </div>
+        <div class="auto-step">
+          <div class="auto-step-icon asi-coral">📊</div>
+          Informe semanal enviado a dirección
+          <span class="auto-step-arrow">✓</span>
+        </div>
+        <div class="auto-widget-footer">
+          <div class="auto-mini-stat">
+            <div class="auto-mini-val"><span>−80</span>%</div>
+            <div class="auto-mini-label">Tiempo manual</div>
+          </div>
+          <div class="auto-mini-stat">
+            <div class="auto-mini-val"><span>0</span></div>
+            <div class="auto-mini-label">Errores humanos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ MARQUEE ══════════ -->
+<div id="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Workflows a medida</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Integración con cualquier API</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> n8n · Zapier · Make</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> CRM · Email · ERP</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Facturación automática</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> RGPD compliant · Datos en Europa</span>
+    <!-- Duplicate for seamless loop -->
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Workflows a medida</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Integración con cualquier API</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> n8n · Zapier · Make</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> CRM · Email · ERP</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Facturación automática</span>
+    <span class="marquee-item"><svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> RGPD compliant · Datos en Europa</span>
+  </div>
+</div>
+
+<!-- ══════════ INTRO ══════════ -->
+<section id="intro">
+  <div class="container">
+    <div class="intro-grid">
+      <div>
+        <div class="intro-label reveal">Por qué Helion Core</div>
+        <h2 class="headline reveal d1">No es una plantilla.<br>Es tu <span class="em">proceso exacto</span>.</h2>
+        <p class="intro-body reveal d2">
+          La mayoría de herramientas de automatización te obligan a adaptarte a ellas. Nosotros hacemos lo contrario: analizamos cómo trabajas y construimos el sistema que necesitas, <b>conectado a las herramientas que ya usas</b>.
+        </p>
+        <p class="intro-body reveal d3" style="margin-top:12px">
+          Sin licencias de software. Sin aprendizaje técnico. <b>Sin trabajo repetitivo.</b>
+        </p>
+      </div>
+      <div class="reveal d2">
+        <div class="intro-card">
+          <div class="intro-card-top">
+            <div class="intro-card-label">Cómo trabajamos contigo</div>
+            <div class="call-flow">
+              <div class="call-step">
+                <div class="call-step-icon blue">🔍</div>
+                Análisis de tus procesos actuales
+                <span class="call-step-arrow">→</span>
+              </div>
+              <div class="call-step">
+                <div class="call-step-icon purple">⚙️</div>
+                Diseño del flujo automatizado
+                <span class="call-step-arrow">→</span>
+              </div>
+              <div class="call-step">
+                <div class="call-step-icon green">🔗</div>
+                Conexión con tus herramientas
+                <span class="call-step-arrow">→</span>
+              </div>
+              <div class="call-step">
+                <div class="call-step-icon amber">🚀</div>
+                Puesta en marcha y monitorización
+                <span class="call-step-arrow">→</span>
+              </div>
+            </div>
+          </div>
+          <div class="intro-card-bottom">
+            <div class="intro-mini-stat">
+              <div class="mini-stat-num"><span>−80</span>%</div>
+              <div class="mini-stat-label">Tiempo manual</div>
+            </div>
+            <div class="intro-mini-stat">
+              <div class="mini-stat-num"><span>4</span>x</div>
+              <div class="mini-stat-label">ROI promedio</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FEATURES BENTO ══════════ -->
+<section id="caracteristicas">
+  <div class="container">
+    <div class="text-center reveal" style="text-align:center">
+      <span class="section-tag"><span class="section-tag-dot"></span>Características</span>
+      <h2 class="headline reveal d1">Todo tipo de automatizaciones.<br>Para cualquier área.</h2>
+    </div>
+    <div class="bento">
+      <div class="bento-card b1 reveal">
+        <div class="bento-icon bi-indigo">⚡</div>
+        <div class="bento-title">Flujos de trabajo personalizados</div>
+        <div class="bento-desc">Diseñamos el workflow exacto que necesitas: desde una aprobación interna hasta un pipeline de ventas completo. Sin plantillas genéricas.</div>
+        <div class="bento-visual">⚡</div>
+      </div>
+      <div class="bento-card b2 reveal d1">
+        <div class="bento-icon bi-coral">🔌</div>
+        <div class="bento-title">Integraciones API ilimitadas</div>
+        <div class="bento-desc">Conectamos cualquier herramienta que uses: Salesforce, HubSpot, Notion, Google Sheets, SAP, tu propio software interno o cualquier servicio con API.</div>
+        <div class="integrations-row">
+          <span class="int-badge">Salesforce</span><span class="int-badge">HubSpot</span>
+          <span class="int-badge">Slack</span><span class="int-badge">Google Sheets</span>
+          <span class="int-badge">SAP</span><span class="int-badge">+ cualquiera</span>
+        </div>
+      </div>
+      <div class="bento-card b3 reveal d2">
+        <div class="bento-icon bi-emerald">📧</div>
+        <div class="bento-title">Email y CRM automático</div>
+        <div class="bento-desc">Secuencias de follow-up, campañas de nurturing y actualización automática de registros sin tocar el CRM manualmente.</div>
+      </div>
+      <div class="bento-card b4 reveal d3">
+        <div class="bento-icon bi-amber">📊</div>
+        <div class="bento-title">Reporting automático</div>
+        <div class="bento-desc">Genera y distribuye informes a la frecuencia que necesites. Dirección siempre informada, sin trabajo manual.</div>
+      </div>
+      <div class="bento-card b5 reveal d1">
+        <div class="bento-icon bi-pink">🏭</div>
+        <div class="bento-title">Operaciones internas</div>
+        <div class="bento-desc">Facturación automática, seguimiento de cobros, onboarding de empleados, gestión de vacaciones y cualquier proceso repetitivo.</div>
+      </div>
+      <div class="bento-card b6 reveal d2">
+        <div class="bento-icon bi-slate">🎯</div>
+        <div class="bento-title">Tu proceso, no el nuestro</div>
+        <div class="bento-desc">No imponemos nuestra metodología. Construimos sobre lo que ya funciona en tu empresa, lo optimizamos y lo hacemos escalar sin fricción.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ HOW ══════════ -->
+<section id="proceso">
+  <div class="container">
+    <div class="how-header">
+      <div>
+        <span class="section-tag" style="border-color:rgba(255,255,255,.1);color:#818CF8;background:rgba(79,70,229,.1);"><span class="section-tag-dot" style="background:#818CF8"></span>Proceso</span>
+        <h2 class="headline">Cuatro pasos.<br>Tu empresa automatizada.</h2>
+      </div>
+      <p class="subline">Desde el análisis inicial hasta el sistema funcionando en producción, lo gestionamos todo.</p>
+    </div>
+    <div class="steps-track">
+      <div class="step-card reveal">
+        <div class="step-circle">01</div>
+        <div class="step-title">Diagnóstico</div>
+        <div class="step-desc">Analizamos tus procesos actuales, identificamos cuellos de botella y definimos qué automatizar primero para mayor impacto.</div>
+        <span class="step-tag">Sesión gratuita</span>
+      </div>
+      <div class="step-card reveal d1">
+        <div class="step-circle">02</div>
+        <div class="step-title">Diseño del flujo</div>
+        <div class="step-desc">Mapeamos el workflow, elegimos las herramientas y definimos cada integración. Te entregamos el roadmap antes de escribir una línea.</div>
+        <span class="step-tag">Entregable: roadmap</span>
+      </div>
+      <div class="step-card reveal d2">
+        <div class="step-circle">03</div>
+        <div class="step-title">Implementación</div>
+        <div class="step-desc">Construimos, probamos y desplegamos la automatización. Ves el progreso en cada fase, con entregas parciales para validar.</div>
+        <span class="step-tag">Plazo: 1–3 semanas</span>
+      </div>
+      <div class="step-card reveal d3">
+        <div class="step-circle">04</div>
+        <div class="step-title">Soporte continuo</div>
+        <div class="step-desc">Monitorizamos, ajustamos y evolucionamos el sistema con tu negocio. Tu automatización mejora a medida que tu empresa crece.</div>
+        <span class="step-tag">Ongoing</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PRICING ══════════ -->
+<section id="precios">
+  <div class="container">
+    <div style="text-align:center">
+      <span class="section-tag reveal"><span class="section-tag-dot"></span>Inversión</span>
+      <h2 class="headline reveal d1">Precio según tu proyecto</h2>
+      <p class="subline reveal d2" style="margin:16px auto 0;text-align:center">Sin suscripciones que no usas. Pagas por lo que construimos.</p>
+    </div>
+    <div class="pricing-row">
+      <!-- Proyecto Inicial -->
+      <div class="p-card reveal">
+        <span class="p-tag">Primer proyecto</span>
+        <div class="p-name">Proyecto Inicial</div>
+        <div class="p-price">
+          <span class="cur">Desde €</span>
+          <span class="amt">1.000</span>
+        </div>
+        <div class="p-desc">Ideal para empresas que quieren automatizar un proceso concreto y ver resultados rápido.</div>
+        <ul class="p-feats">
+          <li><span class="p-check">✓</span>Análisis de requerimientos</li>
+          <li><span class="p-check">✓</span>1 automatización completa</li>
+          <li><span class="p-check">✓</span>Integración con 2–3 herramientas</li>
+          <li><span class="p-check">✓</span>Documentación técnica</li>
+          <li><span class="p-check">✓</span>30 días soporte post-entrega</li>
+        </ul>
+        <a href="#cta" class="btn btn-outline p-cta">Solicitar presupuesto</a>
+      </div>
+      <!-- Solución Avanzada -->
+      <div class="p-card hot reveal d1">
+        <span class="p-tag">Proyecto complejo</span>
+        <div class="p-name">Solución Avanzada</div>
+        <div class="p-price">
+          <span class="amt" style="font-size:2rem">A medida</span>
+        </div>
+        <div class="p-desc">Para empresas que necesitan automatizar múltiples áreas o un proceso crítico con integraciones complejas.</div>
+        <ul class="p-feats">
+          <li><span class="p-check">✓</span>Diagnóstico completo de procesos</li>
+          <li><span class="p-check">✓</span>Múltiples automatizaciones</li>
+          <li><span class="p-check">✓</span>Integraciones ilimitadas</li>
+          <li><span class="p-check">✓</span>Dashboard de monitorización</li>
+          <li><span class="p-check">✓</span>Soporte prioritario</li>
+          <li><span class="p-check">✓</span>Iteraciones incluidas</li>
+        </ul>
+        <a href="#cta" class="btn btn-white p-cta">Hablar con nosotros</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FAQ ══════════ -->
+<section id="faq">
+  <div class="container">
+    <div class="faq-wrap">
+      <div class="faq-left">
+        <span class="section-tag reveal"><span class="section-tag-dot"></span>FAQ</span>
+        <h2 class="headline reveal d1">Preguntas<br>frecuentes</h2>
+        <div class="faq-contact reveal d2">
+          <p>¿No encuentras la respuesta? Nuestro equipo está disponible para resolver cualquier duda.</p>
+          <a href="mailto:hola@helioncoreai.com">Escríbenos →</a>
+        </div>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item reveal">
+          <button class="faq-q" aria-expanded="false">
+            ¿Qué tipo de procesos podéis automatizar?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-ans">
+            <div class="faq-ans-in">Cualquier proceso repetitivo: envío de emails, actualización de CRM, generación de documentos, reporting, facturación, onboarding de clientes o empleados, sincronización de datos entre sistemas, notificaciones automáticas y mucho más.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal d1">
+          <button class="faq-q" aria-expanded="false">
+            ¿Necesito tener conocimientos técnicos?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-ans">
+            <div class="faq-ans-in">No. Nosotros nos encargamos de todo: análisis, diseño, construcción y despliegue. Tu equipo solo necesita usar el resultado. Te explicamos cómo funciona con documentación clara y sin jerga técnica.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal d2">
+          <button class="faq-q" aria-expanded="false">
+            ¿Con qué herramientas trabajáis?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-ans">
+            <div class="faq-ans-in">Trabajamos principalmente con n8n, Make y Zapier para automatizaciones, y desarrollamos integraciones custom cuando es necesario. Nos adaptamos a las herramientas que ya usas en tu empresa, sin obligarte a cambiar nada.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal d3">
+          <button class="faq-q" aria-expanded="false">
+            ¿Cuánto tarda un proyecto?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-ans">
+            <div class="faq-ans-in">Una automatización sencilla puede estar lista en 1 semana. Proyectos con múltiples integraciones o flujos complejos suelen completarse en 3–6 semanas. Antes de empezar siempre te damos una estimación precisa.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal d4">
+          <button class="faq-q" aria-expanded="false">
+            ¿Qué pasa si necesito cambios después de la entrega?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-ans">
+            <div class="faq-ans-in">Incluimos 30 días de soporte post-entrega para ajustes y correcciones. Si necesitas cambios más profundos o nuevas funcionalidades, los presupuestamos por separado. También ofrecemos planes de mantenimiento mensual.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal d5">
+          <button class="faq-q" aria-expanded="false">
+            ¿Cómo se factura el proyecto?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-ans">
+            <div class="faq-ans-in">Presupuesto fijo cerrado antes de empezar. Sin sorpresas, sin costes ocultos. Habitualmente facturamos 50% al inicio y 50% en la entrega final. Para proyectos grandes podemos acordar pagos por fases.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CTA FINAL ══════════ -->
+<section id="cta">
+  <div class="cta-inner container">
+    <span class="section-tag reveal" style="border-color:rgba(255,255,255,.1);color:#818CF8;background:rgba(79,70,229,.1);"><span class="section-tag-dot" style="background:#818CF8"></span>Empieza hoy</span>
+    <h2 class="headline reveal d1">¿Listo para dejar de hacer<br><span class="grad">trabajo manual</span>?</h2>
+    <p class="subline reveal d2">Cuéntanos qué quieres automatizar. Te respondemos con un presupuesto en menos de 24h.</p>
+    <form id="demo-form" class="cta-form reveal d3" novalidate>
+      <input type="text"  id="f-name"    class="cta-input" placeholder="Tu nombre"                         required/>
+      <input type="email" id="f-email"   class="cta-input" placeholder="Email corporativo"                 required/>
+      <input type="text"  id="f-company" class="cta-input" placeholder="Tu empresa"                        required/>
+      <input type="text"  id="f-process" class="cta-input" placeholder="¿Qué proceso quieres automatizar?" required/>
+      <button type="submit" class="btn btn-primary">Solicitar presupuesto →</button>
+    </form>
+    <div class="form-ok" id="form-ok">✓ ¡Solicitud recibida! Te contactaremos con un presupuesto en menos de 24h.</div>
+    <p class="cta-note reveal d4">Sin compromiso · Presupuesto gratuito · Respuesta en &lt;24h</p>
+  </div>
+</section>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="logo.png" alt="Helion Core"/>
+        <p>Automatización inteligente para empresas que quieren operar al máximo rendimiento.</p>
+        <div class="socials">
+          <a href="#" class="social" aria-label="LinkedIn">in</a>
+          <a href="#" class="social" aria-label="Twitter">𝕏</a>
+          <a href="#" class="social" aria-label="Instagram">ig</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-h">Producto</div>
+        <ul class="footer-links">
+          <li><a href="#caracteristicas">Características</a></li>
+          <li><a href="#proceso">Cómo funciona</a></li>
+          <li><a href="#precios">Inversión</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-h">Empresa</div>
+        <ul class="footer-links">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="phone-agents.html">Agentes de Voz</a></li>
+          <li><a href="#">Sobre nosotros</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-h">Contacto</div>
+        <ul class="footer-links">
+          <li><a href="mailto:hola@helioncoreai.com">hola@helioncoreai.com</a></li>
+          <li><a href="#">Soporte técnico</a></li>
+          <li><a href="#">Integraciones</a></li>
+          <li><a href="#">API Docs</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 Helion Core AI, S.L. Todos los derechos reservados.</p>
+      <div class="footer-legal">
+        <a href="#">Privacidad</a>
+        <a href="#">Términos</a>
+        <a href="#">Cookies</a>
+        <a href="#">RGPD</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Navbar scroll ── */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('stuck', scrollY > 50), {passive:true});
+
+/* ── Scroll reveal ── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+}, {threshold:.1});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ── Smooth scroll ── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if(t){ e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); }
+  });
+});
+
+/* ── FAQ ── */
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.closest('.faq-item');
+    const open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => { i.classList.remove('open'); i.querySelector('.faq-q').setAttribute('aria-expanded','false'); });
+    if(!open){ item.classList.add('open'); btn.setAttribute('aria-expanded','true'); }
+  });
+});
+
+/* ── Demo form ── */
+document.getElementById('demo-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const name    = document.getElementById('f-name').value.trim();
+  const email   = document.getElementById('f-email').value.trim();
+  const company = document.getElementById('f-company').value.trim();
+  const process = document.getElementById('f-process').value.trim();
+  if(!name || !email || !company || !process) return;
+  this.style.display='none';
+  document.getElementById('form-ok').classList.add('show');
+});
+</script>
+</body>
+</html>
